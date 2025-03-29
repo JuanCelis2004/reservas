@@ -13,7 +13,9 @@ import javax.persistence.Persistence;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
+import javax.persistence.TypedQuery;
 import model.Reserve;
+import model.Reserve.EstadoReserva;
 import persistence.exceptions.NonexistentEntityException;
 
 /**
@@ -30,9 +32,9 @@ public class ReserveJpaController implements Serializable {
     public EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
-    
-    public ReserveJpaController(){
-        emf=Persistence.createEntityManagerFactory("reservaPu");
+
+    public ReserveJpaController() {
+        emf = Persistence.createEntityManagerFactory("reservaPu");
     }
 
     public void create(Reserve reserve) {
@@ -138,5 +140,56 @@ public class ReserveJpaController implements Serializable {
             em.close();
         }
     }
+
+    public List<Reserve> findReservasByUser(int userId) {
+        EntityManager em = getEntityManager();
+        try {
+            return em.createQuery("SELECT r FROM Reserve r WHERE r.user.id = :userId", Reserve.class)
+                    .setParameter("userId", userId)
+                    .getResultList();
+        } finally {
+            em.close();
+        }
+    }
     
+
+    public void actualizarEstado(int idReserva, EstadoReserva nuevoEstado) throws Exception {
+    EntityManager em = getEntityManager();
+    try {
+        em.getTransaction().begin();
+        Reserve reserva = em.find(Reserve.class, idReserva);
+        if (reserva != null) {
+            reserva.setEstado(nuevoEstado);
+            em.merge(reserva);
+        }
+        em.getTransaction().commit();
+    } finally {
+        em.close();
+    }
+}
+    
+    public static boolean existeReservaEnHorario(String fecha, String horaInicio, String horaFin) {
+    EntityManagerFactory emf = Persistence.createEntityManagerFactory("TuUnidadDePersistencia");
+    EntityManager em = emf.createEntityManager();
+    
+    try {
+        TypedQuery<Long> query = em.createQuery(
+            "SELECT COUNT(r) FROM Reserve r WHERE r.fecha = :fecha " +
+            "AND r.estado != :estadoCancelado " +
+            "AND ((r.horaInicio < :horaFin AND r.horaFin > :horaInicio))", 
+            Long.class);
+        query.setParameter("fecha", fecha);
+        query.setParameter("horaInicio", horaInicio);
+        query.setParameter("horaFin", horaFin);
+        query.setParameter("estadoCancelado", EstadoReserva.CANCELADA);
+
+        Long count = query.getSingleResult();
+        return count > 0; // Si hay reservas activas en ese horario, retorna true
+    } finally {
+        em.close();
+    }
+}
+
+
+
 }

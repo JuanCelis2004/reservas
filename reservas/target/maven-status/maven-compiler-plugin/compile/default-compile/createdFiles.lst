@@ -1,10 +1,12 @@
 persistence\exceptions\NonexistentEntityException.class
-persistence\exceptions\PreexistingEntityException.class
+controller\userController.class
 model\User_.class
 persistence\exceptions\IllegalOrphanException.class
 model\Reserve.class
-persistence\ReserveJpaController.class
 persistence\UserJpaController.class
+controller\reserveController.class
+persistence\exceptions\PreexistingEntityException.class
+persistence\ReserveJpaController.class
 model\Reserve_.class
 model\User.class
 model\Reserve$EstadoReserva.class

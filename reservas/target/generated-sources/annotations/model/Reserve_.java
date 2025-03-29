@@ -8,7 +8,7 @@ import javax.persistence.metamodel.StaticMetamodel;
 import model.Reserve.EstadoReserva;
 import model.User;
 
-@Generated(value="EclipseLink-2.7.12.v20230209-rNA", date="2025-03-28T23:32:52")
+@Generated(value="EclipseLink-2.7.12.v20230209-rNA", date="2025-03-29T05:08:28")
 @StaticMetamodel(Reserve.class)
 public class Reserve_ { 
 
